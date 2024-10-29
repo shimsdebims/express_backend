@@ -1,32 +1,24 @@
 // server.js
 const express = require('express');
-const dotenv = require('dotenv');
-const connectToDatabase = require('./models/database');
-
-dotenv.config();
-
+const dotenv = require('cors');
+const mongoose = require('mongoose');
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(express.json());
+app.use(cors()); // enables CORS for all routes
+app.use(express.json()); //parses incoming JSON requests
 
 // Database Connection
-let db;
-connectToDatabase().then(database => {
-    db = database;
-});
+mongoose.connect('my-mongodb-connection', {/*MAKE THE CONECTION */
+    useNewUrlPARSER: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch((error) => console.error('MongoDB connection error:', error));
 
-// Pass database to routes
-app.use((req, res, next) => {
-    req.db = db;
-    next();
-});
-
-// Import Routes
-app.use('/api/lessons', require('./routes/lessons'));
 
 // Start server
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-});
+})
