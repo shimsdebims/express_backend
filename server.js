@@ -9,6 +9,7 @@ app.use(cors()); // enables CORS for all routes
 app.use(express.json()); //parses incoming JSON requests
 
 const mongoURI = 'mongodb+srv://shimsdebims:mBIv22QHR5Kg0zVP@cluster0.3576s.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+require('dotenv').config();
 
 // Database Connection
 mongoose.connect(mongoURI, {/*MAKE THE CONECTION */
