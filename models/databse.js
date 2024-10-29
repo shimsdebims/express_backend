@@ -1,18 +1,22 @@
 // models/database.js
-const { MongoClient } = require('mongodb');
-require('dotenv').config();
+const mongoose = require('mongoose');
 
-const client = new MongoClient(process.env.MONGODB_URI);
+// Product schema
+const productSchema = new mongoose.Schema({
+    name: String,
+    description: String,
+    price: Number,
+    available: Boolean,
+});
 
-async function connectToDatabase() {
-    try {
-        await client.connect();
-        console.log("Connected to MongoDB Atlas");
-        return client.db('afterSchoolApp'); // Replace with your database name
-    } catch (err) {
-        console.error("Failed to connect to MongoDB", err);
-        process.exit(1);
-    }
-}
+// Order schema
+const orderSchema = new mongoose.Schema({
+    productId: mongoose.Schema.Types.ObjectId,
+    quantity: Number,
+    date: { type: Date, default: Date.now },
+});
 
-module.exports = connectToDatabase;
+const Product = mongoose.model('Product', productSchema);
+const Order = mongoose.model('Order', orderSchema);
+
+module.exports = { Product, Order };
