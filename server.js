@@ -11,7 +11,7 @@ app.use(express.json()); //parses incoming JSON requests
 
 
 // Database Connection
-const mongoURI = process.env.MONGOBD_URI;   //using env variable for URI
+const mongoURI = process.env.MONGODB_URI;   //using env variable for URI
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
