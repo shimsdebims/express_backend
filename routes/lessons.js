@@ -1,6 +1,6 @@
 // routes/lessons.js
 const express = require('express');
-const { Product, Order } = require('../models/database');
+const { Product, Order } = require('../models/database.js');
 const router = express.Router();
 
 // Fetch all products (lessons)
