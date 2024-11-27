@@ -3,17 +3,22 @@ const mongoose = require('mongoose');
 
 // Product schema
 const productSchema = new mongoose.Schema({
-    subject: String,
-    location: String,
-    price: Number,
-    available: Boolean,
+    subject: { type: String, required: true },
+    location: { type: String, required: true },
+    price: { type: Number, required: true },
+    space: { type: Number, default: 5 },
+    image: { type: String, default: '/default-image.jpg' },
+    available: { type: Boolean, default: true }
 });
 
 // Order schema
+
 const orderSchema = new mongoose.Schema({
-    productId: mongoose.Schema.Types.ObjectId,
-    quantity: Number,
-    date: { type: Date, default: Date.now },
+    name: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+    lessonIDs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    quantity: { type: Number, required: true },
+    date: { type: Date, default: Date.now }
 });
 
 const Product = mongoose.model('Product', productSchema);

@@ -3,7 +3,19 @@ const { Order, Product } = require('../models/database');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-// POST /orders
+// GET /api/orders
+router.get('/', async (req, res) => {
+    try {
+        const orders = await Order.find(); // Fetch all orders from the database
+        res.json(orders); // Return the orders as JSON
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ error: 'Failed to fetch orders', message: error.message });
+    }
+});
+
+
+// POST API/orders
 router.post('/orders', async (req, res) => {
     const { name, phoneNumber, lessonIDs, quantity } = req.body;
 
