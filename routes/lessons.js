@@ -4,12 +4,16 @@ const { Product, Order } = require('../models/database.js');
 const router = express.Router();
 
 // Fetch all products (lessons)
+
 router.get('/products', async (req, res) => {
     try {
+        console.log('Fetching products...');
         const products = await Product.find();
+        console.log('Products found:', products);
         res.json(products);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching products' });
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Error fetching products', error: error.message });
     }
 });
 

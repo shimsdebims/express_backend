@@ -4,9 +4,21 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config(); //to load environments
 const { requestLogger, lessonImageMiddleware } = require('./middleware/simpleMiddleware');
-
-
 const app = express();
+
+
+
+// Only allow requests from your Vue.js app
+const corsOptions = {
+    origin: ['http://localhost:5001', 'https://github.com/shimsdebims/express_backend.git'],
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+// *** app.use(cors(corsOptions));
+
+app.use('/uploads', express.static('uploads'));
+
+
 // Middleware
 app.use(cors()); // enables CORS for all routes
 app.use(express.json()); //parses incoming JSON requests
