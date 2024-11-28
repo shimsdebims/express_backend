@@ -1,27 +1,30 @@
-// models/database.js
 const mongoose = require('mongoose');
 
 // Product schema
-const productSchema = new mongoose.Schema({
+const lessonsSchema = new mongoose.Schema({
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
     subject: { type: String, required: true },
+    price: { type: String, required: true },
     location: { type: String, required: true },
-    price: { type: Number, required: true },
-    space: { type: Number, default: 5 },
-    image: { type: String, default: '/default-image.jpg' },
-    available: { type: Boolean, default: true }
+    space: { type: Boolean, required: true },
+    image: { type: String, required: true }
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 // Order schema
-
 const orderSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    lessonIDs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    quantity: { type: Number, required: true },
-    date: { type: Date, default: Date.now }
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+    lessonsId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'lessons' },
+    quantity: { type: Number, required: true, min: 1, max: 10 }
+}, {
+    timestamps: true
 });
 
-const Product = mongoose.model('Product', productSchema);
+// Create models
+const lessons = mongoose.model('lessons', lessonsSchema);
 const Order = mongoose.model('Order', orderSchema);
 
-module.exports = { Product, Order };
+module.exports = { lessons, Order };

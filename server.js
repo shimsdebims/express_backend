@@ -10,7 +10,7 @@ const app = express();
 
 // Only allow requests from your Vue.js app
 const corsOptions = {
-    origin: ['http://localhost:5001', 'http://localhost:5000', 'http://127.0.0.1:5000'],
+    origin: ['http://localhost:5001', 'http://127.0.0.1:5000'],
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization']
 };

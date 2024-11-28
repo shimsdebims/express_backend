@@ -1,5 +1,5 @@
 const express = require('express');
-const { Order, Product } = require('../models/database');
+const { Order, lessons } = require('../models/database');
 const mongoose = require('mongoose');
 const router = express.Router();
 
@@ -41,15 +41,15 @@ router.post('/orders', async (req, res) => {
             return res.status(400).json({ message: `Invalid lesson ID: ${lessonID}` });
         }
 
-        const product = await Product.findById(lessonID);
-        if (!product) {
+        const lessons = await lessons.findById(lessonID);
+        if (!lessons) {
             return res.status(404).json({ message: `Lesson with ID ${lessonID} not found.` });
         }
 
         // Check Availability
-        if (product.space < quantity) {
+        if (lessons.space < quantity) {
             return res.status(400).json({ 
-                message: `Not enough space available for lesson: ${product.name}.` 
+                message: `Not enough space available for lesson: ${lessons.name}.` 
             });
         }
     }

@@ -1,45 +1,43 @@
 // routes/lessons.js
 const express = require('express');
-const { Product, Order } = require('../models/database.js');
+const { lessons, Order } = require('../models/database.js');
 const router = express.Router();
 
-// Fetch all products (lessons)
+// Fetch all Lessons (lessons)
 
-router.get('/products', async (req, res) => {
+router.get('/lessons', async (req, res) => {
     try {
-        console.log('Attempting to fetch products...');
-        const products = await Product.find();
+        console.log('Attempting to fetch lessons...');
+        const lessons = await lessons.find();
         
-        console.log('Raw products from database:', products);
+        console.log('Raw lessons from database:', lessons);
         
-        if (products.length === 0) {
-            console.log('No products found in the database');
-            return res.status(404).json({ message: 'No products found' });
+        if (lessons.length === 0) {
+            console.log('No lessons found in the database');
+            return res.status(404).json({ message: 'No lessons found' });
         }
-        // Transformed products to match front-end expectations
-        const formattedProducts = products.map(product => ({
-            _id: product._id,
-            subject: product.subject,
-            location: product.location,
-            price: product.price,
-            space: product.space,
-            image: product.image || '/default-image.jpg'
+        // Transformed lessons to match front-end expectations
+        const formattedlessons = lessons.map(lessons => ({
+            _id: lessons._id,
+            subject: lessons.subject,
+            location: lessons.location,
+            price: lessons.price,
+            space: lessons.space,
+            image: lessons.image || '/default-image.jpg'
         }));
-        res.json(formattedProducts);
+        res.json(formattedlessons);
         
-        console.log('Formatted products:', formattedProducts);
-        res.json(formattedProducts);
     } catch (error) {
-        console.error('Error fetching products:', error);
-        res.status(500).json({ message: 'Error fetching products', error: error.message });
+        console.error('Error fetching lessons:', error);
+        res.status(500).json({ message: 'Error fetching lessons', error: error.message });
     }
 });
 
 // Create a new order
 router.post('/orders', async (req, res) => {
-    const { productId, quantity } = req.body;
+    const { lessonsId, quantity } = req.body;
     try {
-        const newOrder = new Order({ productId, quantity });
+        const newOrder = new Order({ lessonsId, quantity });
         await newOrder.save();
         res.status(201).json(newOrder);
     } catch (error) {
