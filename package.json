@@ -1,22 +1,22 @@
 {
-  "name": "express-backend",
+  "name": "after-school-classes-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "After School Classes Booking App",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "mongo": "^0.1.0",
-    "mongodb": "4.0",
-    "mongosh": "^2.3.4"
-  }
+    "mongodb": "^5.9.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

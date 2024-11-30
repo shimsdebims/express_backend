@@ -1,159 +1,128 @@
-// server.js
+// Import required modules
+const express = require('express'); // Framework for building web applications
+const { MongoClient } = require('mongodb'); // MongoDB driver for Node.js
+const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
+const path = require('path'); // Built-in Node.js module to handle file paths
+const morgan = require('morgan'); // Middleware for logging HTTP requests
 
-// Import necessary libraries and modules
-const { MongoClient, ObjectId } = require('mongodb'); // MongoDB client and ObjectId for document identification
-const express = require('express'); // Express framework for building web applications
-const cors = require('cors'); // Middleware for enabling CORS (Cross-Origin Resource Sharing)
-const { requestLogger, lessonImageMiddleware } = require('./middleware'); // Custom middleware for logging requests and handling lesson images
-require('dotenv').config(); // Load environment variables from .env file
-
-// Create an instance of an Express application
+// Create an Express app
 const app = express();
+const PORT = 3001; // Port number for the server
 
-// Middleware setup
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Parse incoming JSON requests
-app.use('/uploads', express.static('uploads')); // Serve static files from the 'uploads' directory
-app.use(lessonImageMiddleware); // Custom middleware for handling lesson images
-app.use(requestLogger); // Custom middleware for logging requests
+// MongoDB connection details
+const MONGODB_URI = 'mongodb+srv://sc2371:shimsdebims@cluster0.0ukd3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const DB_NAME = 'afterSchoolApp'; // Name of the database
 
-// MongoDB Connection
-const mongoURI = process.env.MONGODB_URI; // MongoDB connection URI from environment variables
-let db; // Variable to hold the database connection
+// Middleware
+app.use(cors()); // Enable CORS for all incoming requests
+app.use(express.json()); // Middleware to parse incoming JSON request bodies
+app.use(morgan('dev')); // Logs HTTP requests to the console in 'dev' format
 
-// Connect to MongoDB
-MongoClient.connect(mongoURI, { useUnifiedTopology: true })
-    .then(client => {
-        console.log('Connected to MongoDB'); // Log successful connection
-        db = client.db('afterSchoolApp'); // Set the database to 'afterSchoolApp'
-        
-        // Start the server after successful DB connection
-        const PORT = process.env.PORT || 5001; // Use the port from environment variables or default to 5001
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`); // Log the server start message
-        });
-    })
-    .catch(err => console.error('MongoDB connection error:', err)); // Log any connection errors
-
-// Validation Functions
-// Middleware to validate order requests
-const validateOrder = (req, res, next) => {
-    const { name, phoneNumber, lessonIDs, quantity } = req.body; // Destructure request body
-
-    // Validate name (letters and spaces only)
-    if (!/^[a-zA-Z\s]+$/.test(name)) {
-        return res.status(400).json({ error: 'Name must contain only letters' }); // Return error if validation fails
+// Static file middleware for serving lesson images
+// Serve images from a specific directory
+app.use('/images', express.static(path.join(__dirname, 'images'), {
+  setHeaders: (res, filePath) => {
+    // Check file extension and only allow image files
+    const ext = path.extname(filePath).toLowerCase();
+    if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext)) {
+      res.setHeader('Content-Type', `image/${ext.slice(1)}`);
     }
+  }
+}));
 
-    // Validate phone number (must be exactly 10 digits)
-    if (!/^\d{10}$/.test(phoneNumber)) {
-        return res.status(400).json({ error: 'Phone number must be 10 digits' }); // Return error if validation fails
-    }
+// Serve Vue.js frontend application
+app.use(express.static(path.join(__dirname, 'public'))); // Serve files from the 'public' directory
 
-    next(); // Proceed to the next middleware or route handler if validations pass
-};
+// MongoDB connection variable
+let db;
 
-// Routes
+// Function to connect to MongoDB
+async function connectToDatabase() {
+  try {
+    const client = new MongoClient(MONGODB_URI); // Initialize MongoDB client
+    await client.connect(); // Connect to MongoDB server
+    console.log('Connected to MongoDB');
+    db = client.db(DB_NAME); // Assign the database instance to the `db` variable
+  } catch (error) {
+    console.error('Failed to connect to MongoDB', error); // Log any connection errors
+    process.exit(1); // Exit the application if unable to connect to MongoDB
+  }
+}
 
 // GET route to fetch all lessons
-app.get('/lessons', async (req, res) => {
-    try {
-        const lessons = await db.collection('lessons').find().toArray(); // Fetch all lessons from the database
-        res.json(lessons); // Send the lessons as a JSON response
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching lessons', error: error.message }); // Handle any errors
-    }
+app.get('/Lessons', async (req, res) => {
+  try {
+    console.log('Lessons route hit'); // Log the route being accessed
+    const Lessons = await db.collection('Lessons').find({}).toArray(); // Fetch all documents in the 'Lessons' collection
+    console.log('Lessons found:', Lessons); // Log the retrieved lessons
+    res.json(Lessons); // Send lessons as a JSON response
+  } catch (error) {
+    console.error('Error fetching Lessons:', error); // Log errors
+    res.status(500).json({ message: 'Error fetching Lessons', error: error.message }); // Send error response
+  }
 });
 
-// GET route to fetch a specific lesson by ID
-app.get('/lessons/:id', async (req, res) => {
-    try {
-        const { id } = req.params; // Get the lesson ID from the URL parameters
-        const lesson = await db.collection('lessons').findOne({ _id: new ObjectId(id) }); // Fetch the lesson by ID
-
-        if (!lesson) {
-            return res.status(404).json({ error: 'Lesson not found' }); // Return error if lesson is not found
-        }
-
-        res.json(lesson); // Send the lesson data back to the client
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching lesson', error: error.message }); // Handle any errors
-    }
-});
-
-// POST route to create a new order
-app.post('/Orders', validateOrder, async (req, res) => {
-    try {
-        const { name, phoneNumber, lessonIDs, quantity } = req.body; // Destructure request body
-
-        // Check lesson availability by fetching lessons based on provided lesson IDs
-        const lessons = await db.collection('lessons').find({
-            _id: { $in: lessonIDs.map(id => new ObjectId(id)) } // Convert string IDs to ObjectId
-        }).toArray();
-
-        // Filter for lessons that do not have enough space
-        const unavailableLessons = lessons.filter(lesson => lesson.space < quantity);
-        
-        // If any lessons are unavailable, return an error response
-        if (unavailableLessons.length > 0) {
-            return res.status(400).json({ 
-                error: 'Insufficient spaces',
- unavailableLessons: unavailableLessons.map(l => l.subject) // List the subjects of unavailable lessons
-            });
-        }
-        
-        // Create a new order in the database
-        const OrderResult = await db.collection('Orders').insertOne({
-            name, phoneNumber, lessonIDs, quantity // Store order details
-        });
-        
-        // Update the available spaces for each lesson in the order
-        for (const lessonId of lessonIDs) {
-            await db.collection('lessons').updateOne(
-                { _id: new ObjectId(lessonId) }, // Find the lesson by ID
-                { $inc: { space: -quantity } } // Decrease the space by the quantity ordered
-            );
-        }
-        
-        res.status(201).json(OrderResult); // Respond with the created order details
-    } catch (error) {
-        res.status(500).json({ error: 'Order creation failed' }); // Handle any errors during order creation
-    }
-});
-
-// PUT route to update lesson details
-app.put('/lessons/:id', async (req, res) => {
-    const { id } = req.params; // Get the lesson ID from the URL parameters
-    const { space } = req.body; // Get the new space value from the request body
-    try {
-        // Update the lesson's space in the database
-        const updatedLesson = await db.collection('lessons').findOneAndUpdate(
-            { _id: new ObjectId(id) }, // Find the lesson by ID
-            { $set: { space } }, // Set the new space value
-            { returnOriginal: false } // Return the updated document
-        );
-        res.json(updatedLesson.value); // Send the updated lesson data back to the client
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating lesson', error: error.message }); // Handle any errors
-    }
-});
-
-// Search Functionality
-// GET route to search for lessons based on a query
+// GET route to search for lessons based on query parameters
 app.get('/search', async (req, res) => {
-    const { query } = req.query; // Get the search query from the request
-    try {
-        // Search for lessons that match the query in subject, location, price, or space
-        const lessons = await db.collection('lessons').find({
-            $or: [
-                { subject: { $regex: query, $options: 'i' } }, // Case-insensitive search in subject
-                { location: { $regex: query, $options: 'i' } }, // Case-insensitive search in location
-                { price: { $regex: query, $options: 'i' } }, // Case-insensitive search in price
-                { space: { $regex: query, $options: 'i' } } // Case-insensitive search in space
-            ]
-        }).toArray();
-        res.json(lessons); // Send the search results back to the client
-    } catch (error) {
-        res.status(500).json({ message: 'Error searching lessons', error: error.message }); // Handle any errors
-    }
+  try {
+    const { query } = req; // Extract query parameters from the request
+    const searchTerm = query.q; // Assume the search term is passed as 'q'
+
+    console.log('Search term:', searchTerm); // Log the search term
+
+    // Perform a search in the 'Lessons' collection
+    const lessons = await db.collection('Lessons').find({
+      $or: [ // Match lessons where any of the following fields match the search term
+        { topic: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search in 'topic'
+        { location: { $regex: searchTerm, $options: 'i' } }, // Search in 'location'
+        { price: { $regex: searchTerm, $options: 'i' } }, // Search in 'price'
+        { space: { $regex: searchTerm, $options: 'i' } } // Search in 'space'
+      ]
+    }).toArray();
+
+    console.log('Search results:', lessons); // Log the search results
+    res.json(lessons); // Send the search results as JSON
+  } catch (error) {
+    console.error('Error searching lessons:', error); // Log errors
+    res.status(500).json({ message: 'Error searching lessons', error: error.message }); // Send error response
+  }
 });
+
+// POST route to save a new order
+app.post('/Orders', async (req, res) => {
+  try {
+    const newOrder = req.body; // Extract order details from the request body
+    const result = await db.collection('Orders').insertOne(newOrder); // Insert new order into the 'Orders' collection
+    res.status(201).json(result); // Send insertion result with status 201 (Created)
+  } catch (error) {
+    console.error('Error saving order:', error); // Log errors
+    res.status(500).json({ message: 'Error saving order', error: error.message }); // Send error response
+  }
+});
+
+// PUT route to update the available spaces for a lesson
+app.put('/Lessons/:id', async (req, res) => {
+  try {
+    const { id } = req.params; // Extract lesson ID from the request parameters
+    const { space } = req.body; // Extract the updated space value from the request body
+    const result = await db.collection('Lessons').updateOne(
+      { _id: new MongoClient.ObjectId(id) }, // Match lesson by its ObjectId
+      { $set: { space } } // Update the 'space' field with the new value
+    );
+    res.json(result); // Send the update result as JSON
+  } catch (error) {
+    console.error('Error updating lesson:', error); // Log errors
+    res.status(500).json({ message: 'Error updating lesson', error: error.message }); // Send error response
+  }
+});
+
+// Function to start the server
+async function startServer() {
+  await connectToDatabase(); // Connect to the database before starting the server
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`); // Log that the server is running
+  });
+}
+
+// Start the server
+startServer();
