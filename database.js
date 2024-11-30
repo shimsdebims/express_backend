@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
+// Create models
 
 // Product schema
 const lessonsSchema = new mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-    subject: { type: String, required: true },
-    price: { type: String, required: true },
+    price: { type: Number, required: true },
     location: { type: String, required: true },
-    space: { type: Boolean, required: true },
-    image: { type: String, required: true }
+    space: { type: Number, required: true },
+    image: { type: String, required: true },
+    subject: { type: String, required: true }
 }, {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
 });
+const lessons = mongoose.model('Lessons', lessonsSchema);
 
 // Order schema
 const orderSchema = new mongoose.Schema({
@@ -23,8 +23,6 @@ const orderSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Create models
-const lessons = mongoose.model('lessons', lessonsSchema);
 const Order = mongoose.model('Order', orderSchema);
 
 module.exports = { lessons, Order };

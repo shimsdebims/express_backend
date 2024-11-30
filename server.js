@@ -10,7 +10,7 @@ const app = express();
 
 // Only allow requests from your Vue.js app
 const corsOptions = {
-    origin: ['http://localhost:5001', 'http://127.0.0.1:5000'],
+    origin: ['http://localhost:5001', 'http://127.0.0.1:5001','http://localhost:3000', 'http://127.0.0.1:3000'],
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -29,12 +29,13 @@ app.use(lessonImageMiddleware);  //  image handling middleware
 
 // Database Connection
 const mongoURI = process.env.MONGODB_URI;   //using env variable for URI
+
 mongoose.connect(mongoURI)
 .then(() => {
     console.log('Connected to MongoDB');
 })
 .catch((error) => {console.error('MongoDB connection error:', error);
-    process.exit(1); //exits process with failure if MongoDB connection fails
+   process.exit(1); //exits process with failure if MongoDB connection fails
 })
 
 //Handling MongoDB connection events
@@ -45,8 +46,9 @@ mongoose.connection.on('disconnected', () =>{
     console.log('MongoDB disconnected. Attempting to reconnect...');
 });
 
+
 // Configuring and defining Routes 
-const lessonsRouter = require('./routes/lessons');
+const lessonsRouter = require('./routes/lessons.js');
 app.use('/api/lessons', lessonsRouter); 
 
 const ordersRouter = require('./routes/Orders');
