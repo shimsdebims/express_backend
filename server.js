@@ -20,9 +20,9 @@ app.use(morgan('dev')); // Logs HTTP requests to the console in 'dev' format
 
 // Static file middleware for serving lesson images
 // Serve images from a specific directory
+// Serve images from a specific directory
 app.use('/images', express.static(path.join(__dirname, 'images'), {
   setHeaders: (res, filePath) => {
-    // Check file extension and only allow image files
     const ext = path.extname(filePath).toLowerCase();
     if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext)) {
       res.setHeader('Content-Type', `image/${ext.slice(1)}`);
