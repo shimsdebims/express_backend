@@ -8,8 +8,11 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "brew": "^0.0.8",
     "cors": "^2.8.5",
     "express": "^4.21.1",
+    "homebrew": "^0.1.0",
+    "mongo": "^0.1.0",
     "mongodb": "^5.9.2",
     "morgan": "^1.10.0"
   },

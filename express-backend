@@ -1,0 +1,10 @@
+{"_id":{"$oid":"673451e2e849419054beef2b"},"price":"100","location":"BG01","space":"5","image":"math.png","subject":"Math"}
+{"_id":{"$oid":"673452cce849419054bf84f5"},"price":"80","location":"HB20","space":"5","image":"economics.png","subject":"Economics"}
+{"_id":{"$oid":"67345308e849419054bfadc1"},"price":"90","location":"CG04","space":"5","image":"spanish.png","subject":"Spanish"}
+{"_id":{"$oid":"67345325e849419054bfbff8"},"price":"90","location":"HG05","space":"5","image":"french.png","subject":"French"}
+{"_id":{"$oid":"67345343e849419054bfd32e"},"price":"90","location":"BG02","space":"5","image":"german.png","subject":"German"}
+{"_id":{"$oid":"67345365e849419054bfeabe"},"price":"150","location":"BG09","space":"5","image":"chemistry.png","subject":"Chemistry"}
+{"_id":{"$oid":"6734537ce849419054bff969"},"price":"100","location":"HG04","space":"5","image":"biology.png","subject":"Biology"}
+{"_id":{"$oid":"67345396e849419054c00ab8"},"price":"120","location":"CG03","space":"5","image":"algebra.png","subject":"Algebra"}
+{"_id":{"$oid":"673453b6e849419054c01ef6"},"price":"70","location":"HG01","space":"5","image":"history.png","subject":"History"}
+{"_id":{"$oid":"673453dce849419054c03831"},"price":"200","location":"CG01","space":"5","image":"advanced-math.png","subject":"Advanced Math"}
