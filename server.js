@@ -32,15 +32,16 @@ async function connectToDatabase() {
 
 // Middleware
 app.use(cors({
-  origin: [
-    'https://shimsdebims.github.io/vueapp/',
-    'https://github.com/shimsdebims/express_backend',
-    'http://localhost:3001',
-    'http://localhost:8080'
-  ]
-})); // Enable CORS for all incoming requests
+  origin: 'https://shimsdebims.github.io/vueapp/'
+}));
+ // Enable CORS for all incoming requests
 app.use(express.json()); // Middleware to parse incoming JSON request bodies
 app.use(morgan('dev')); // Logs HTTP requests to the console in 'dev' format
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 
 // Static file middleware for serving lesson images
 // Serve images from a specific directory
@@ -129,8 +130,8 @@ app.put('/Lessons/:id', async (req, res) => {
 // Function to start the server
 async function startServer() {
   await connectToDatabase(); // Connect to the database before starting the server
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`); // Log that the server is running
+  app.listen(process.env.PORT || 3001, () => {
+    console.log('Server is running on PORT:3001');
   });
 }
 
