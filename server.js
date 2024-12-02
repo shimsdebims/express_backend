@@ -33,6 +33,7 @@ async function connectToDatabase() {
 // Middleware
 app.use(cors({
   origin: [
+    'https://shimsdebims.github.io/vueapp/',
     'https://github.com/shimsdebims/express_backend',
     'http://localhost:3001',
     'http://localhost:8080'
