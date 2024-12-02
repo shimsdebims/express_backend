@@ -6,14 +6,15 @@ const path = require('path'); // Built-in Node.js module to handle file paths
 const morgan = require('morgan'); // Middleware for logging HTTP requests
 require('dotenv').config();
 const DB_NAME = process.env.DB_NAME;
+const PORT = process.env.PORT || 10000; //PORT NUMBER
 
 // Create an Express app
 const app = express();
-const PORT = process.env.PORT || 3001; //PORT NUMBER
+
 
 
 // MongoDB connection 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI; 
 let db; // MongoDB connection variable
 
 // Function to connect to MongoDB
@@ -129,8 +130,8 @@ app.put('/Lessons/:id', async (req, res) => {
 // Function to start the server
 async function startServer() {
   await connectToDatabase(); // Connect to the database before starting the server
-  app.listen(process.env.PORT || 3001, () => {
-    console.log('Server is running on PORT:3001');
+  app.listen(process.env.PORT || 10000, () => {
+    console.log('Server is running on PORT:10000');
   });
 }
 
