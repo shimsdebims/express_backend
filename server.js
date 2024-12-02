@@ -5,7 +5,7 @@ const cors = require('cors'); // Middleware to enable Cross-Origin Resource Shar
 const path = require('path'); // Built-in Node.js module to handle file paths
 const morgan = require('morgan'); // Middleware for logging HTTP requests
 require('dotenv').config();
-
+const DB_NAME = process.env.DB_NAME;
 
 // Create an Express app
 const app = express();
@@ -22,7 +22,7 @@ async function connectToDatabase() {
     const client = new MongoClient(MONGODB_URI); // Initialize MongoDB client
     await client.connect(); // Connect to MongoDB server
     console.log('Connected to MongoDB');
-    db = client.db(); // Assign the database instance to the `db` variable
+    db = client.db(DB_NAME); // Assign the database instance to the `db` variable
   } catch (error) {
     console.error('Failed to connect to MongoDB', error); // Log any connection errors
     process.exit(1); // Exit the application if unable to connect to MongoDB
@@ -34,7 +34,8 @@ async function connectToDatabase() {
 app.use(cors({
   origin: [
     'https://github.com/shimsdebims/express_backend',
-    'http://localhost:3001'
+    'http://localhost:3001',
+    'http://localhost:8080'
   ]
 })); // Enable CORS for all incoming requests
 app.use(express.json()); // Middleware to parse incoming JSON request bodies
