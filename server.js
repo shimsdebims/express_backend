@@ -10,9 +10,7 @@ const DB_NAME = process.env.DB_NAME;
 // Create an Express app
 const app = express();
 const PORT = process.env.PORT || 3001; //PORT NUMBER
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
-})
+
 
 // MongoDB connection 
 const MONGODB_URI = process.env.MONGODB_URI;
