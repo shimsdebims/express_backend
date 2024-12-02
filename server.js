@@ -4,17 +4,39 @@ const { MongoClient } = require('mongodb'); // MongoDB driver for Node.js
 const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
 const path = require('path'); // Built-in Node.js module to handle file paths
 const morgan = require('morgan'); // Middleware for logging HTTP requests
+require('dotenv').config();
+
 
 // Create an Express app
 const app = express();
 const PORT = 3001; // Port number for the server
 
-// MongoDB connection details
-const MONGODB_URI = 'mongodb+srv://sc2371:shimsdebims@cluster0.0ukd3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const DB_NAME = 'afterSchoolApp'; // Name of the database
+
+// MongoDB connection 
+const MONGODB_URI = process.env.MONGODB_URI;
+let db; // MongoDB connection variable
+
+// Function to connect to MongoDB
+async function connectToDatabase() {
+  try {
+    const client = new MongoClient(MONGODB_URI); // Initialize MongoDB client
+    await client.connect(); // Connect to MongoDB server
+    console.log('Connected to MongoDB');
+    db = client.db(); // Assign the database instance to the `db` variable
+  } catch (error) {
+    console.error('Failed to connect to MongoDB', error); // Log any connection errors
+    process.exit(1); // Exit the application if unable to connect to MongoDB
+  }
+}
+
 
 // Middleware
-app.use(cors()); // Enable CORS for all incoming requests
+app.use(cors({
+  origin: [
+    'https://github.com/shimsdebims/express_backend',
+    'http://localhost:3001'
+  ]
+})); // Enable CORS for all incoming requests
 app.use(express.json()); // Middleware to parse incoming JSON request bodies
 app.use(morgan('dev')); // Logs HTTP requests to the console in 'dev' format
 
@@ -32,8 +54,6 @@ app.use('/images', express.static(path.join(__dirname, 'images'), {
 // Serve Vue.js frontend application
 app.use(express.static(path.join(__dirname, 'public'))); // Serve files from the 'public' directory
 
-// MongoDB connection variable
-let db;
 
 // Function to connect to MongoDB
 async function connectToDatabase() {
