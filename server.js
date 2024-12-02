@@ -42,6 +42,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// GET route to fetch all lessons
+app.get('https://express-backend-fyqh.onrender.com/api/Lessons', async (req, res) => {
+  try {
+    console.log('Lessons route hit'); // Log the route being accessed
+    const Lessons = await db.collection('Lessons').find({}).toArray(); // Fetch all documents in the 'Lessons' collection
+    console.log('Lessons found:', Lessons); // Log the retrieved lessons
+    res.json(Lessons); // Send lessons as a JSON response
+  } catch (error) {
+    console.error('Error fetching Lessons:', error); // Log errors
+    res.status(500).json({ message: 'Error fetching Lessons', error: error.message }); // Send error response
+  }
+});
 
 // Static file middleware for serving lesson images
 // Serve images from a specific directory
@@ -58,19 +70,6 @@ app.use('/images', express.static(path.join(__dirname, 'images'), {
 app.use(express.static(path.join(__dirname, 'public'))); // Serve files from the 'public' directory
 
 
-
-// GET route to fetch all lessons
-app.get('/Lessons', async (req, res) => {
-  try {
-    console.log('Lessons route hit'); // Log the route being accessed
-    const Lessons = await db.collection('Lessons').find({}).toArray(); // Fetch all documents in the 'Lessons' collection
-    console.log('Lessons found:', Lessons); // Log the retrieved lessons
-    res.json(Lessons); // Send lessons as a JSON response
-  } catch (error) {
-    console.error('Error fetching Lessons:', error); // Log errors
-    res.status(500).json({ message: 'Error fetching Lessons', error: error.message }); // Send error response
-  }
-});
 
 // GET route to search for lessons based on query parameters
 app.get('/search', async (req, res) => {
