@@ -58,18 +58,6 @@ app.use('/images', express.static(path.join(__dirname, 'images'), {
 app.use(express.static(path.join(__dirname, 'public'))); // Serve files from the 'public' directory
 
 
-// Function to connect to MongoDB
-async function connectToDatabase() {
-  try {
-    const client = new MongoClient(MONGODB_URI); // Initialize MongoDB client
-    await client.connect(); // Connect to MongoDB server
-    console.log('Connected to MongoDB');
-    db = client.db(DB_NAME); // Assign the database instance to the `db` variable
-  } catch (error) {
-    console.error('Failed to connect to MongoDB', error); // Log any connection errors
-    process.exit(1); // Exit the application if unable to connect to MongoDB
-  }
-}
 
 // GET route to fetch all lessons
 app.get('/Lessons', async (req, res) => {
