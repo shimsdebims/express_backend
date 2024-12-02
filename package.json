@@ -4,8 +4,7 @@
   "description": "After School Classes Booking App",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "brew": "^0.0.8",
