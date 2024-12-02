@@ -20,7 +20,6 @@ app.use(morgan('dev')); // Logs HTTP requests to the console in 'dev' format
 
 // Static file middleware for serving lesson images
 // Serve images from a specific directory
-// Serve images from a specific directory
 app.use('/images', express.static(path.join(__dirname, 'images'), {
   setHeaders: (res, filePath) => {
     const ext = path.extname(filePath).toLowerCase();
@@ -106,9 +105,10 @@ app.put('/Lessons/:id', async (req, res) => {
     const { id } = req.params; // Extract lesson ID from the request parameters
     const { space } = req.body; // Extract the updated space value from the request body
     const result = await db.collection('Lessons').updateOne(
-      { _id: new MongoClient.ObjectId(id) }, // Match lesson by its ObjectId
-      { $set: { space } } // Update the 'space' field with the new value
+      { _id: new MongoClient.ObjectId(id) }, //  ObjectId conversion
+      { $set: updateData } // Use $set to update multiple fields
     );
+
     res.json(result); // Send the update result as JSON
   } catch (error) {
     console.error('Error updating lesson:', error); // Log errors
