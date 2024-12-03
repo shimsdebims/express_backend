@@ -31,6 +31,7 @@ async function connectToDatabase() {
 const allowedOrigins = [
   'https://shimsdebims.github.io', // GitHub Pages
   'http://localhost:8080', // Local testing (optional)
+  
 ];
 
 const corsOptions = {
@@ -141,6 +142,7 @@ app.post('/Orders', async (req, res) => {
 });
 
 
+// PUT route to update the available space for a lesson
 // PUT route to update the available spaces for a lesson
 app.put('/Lessons/:id', async (req, res) => {
   try {
@@ -149,7 +151,7 @@ app.put('/Lessons/:id', async (req, res) => {
 
       // Perform the update
       const result = await db.collection('Lessons').updateOne(
-        { _id: ObjectId(id) }, // Use ObjectId from MongoDB
+        { _id: new ObjectId(id) }, // Use 'new ObjectId' to create an instance
         { $set: { space } }
     );
 
