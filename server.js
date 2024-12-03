@@ -1,6 +1,6 @@
 // Import required modules
 const express = require('express'); // Framework for building web applications
-const { MongoClient } = require('mongodb'); // MongoDB driver for Node.js
+const { MongoClient, ObjectId } = require('mongodb'); // MongoDB driver for Node.js
 const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
 const path = require('path'); // Built-in Node.js module to handle file paths
 const morgan = require('morgan'); // Middleware for logging HTTP requests
@@ -149,9 +149,9 @@ app.put('/Lessons/:id', async (req, res) => {
 
       // Perform the update
       const result = await db.collection('Lessons').updateOne(
-          { _id: new MongoClient.ObjectId(id) },
-          { $set: { space } } // Use the extracted 'space' value
-      );
+        { _id: ObjectId(id) }, // Use ObjectId from MongoDB
+        { $set: { space } }
+    );
 
       res.json(result);
   } catch (error) {
