@@ -34,6 +34,7 @@ async function connectToDatabase() {
 // Middleware
 app.use(cors({
   origin: ['https://shimsdebims.github.io', 'http://localhost:10000'], // Add allowed origins
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -46,7 +47,7 @@ app.use((req, res, next) => {
 });
 
 // GET route to fetch all lessons
-app.get('/api/Lessons', async (req, res) => {
+app.get('/Lessons', async (req, res) => {
   try {
     console.log('Lessons route hit'); // Log the route being accessed
     const Lessons = await db.collection('Lessons').find({}).toArray(); // Fetch all documents in the 'Lessons' collection
