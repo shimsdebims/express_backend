@@ -28,12 +28,24 @@ async function connectToDatabase() {
 }
 
 // 
-app.use(cors({
-  origin: ['https://shimsdebims.github.io'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+const allowedOrigins = [
+  'https://shimsdebims.github.io', // GitHub Pages
+  'http://localhost:8080', // Local testing (optional)
+];
 
+const corsOptions = {
+  origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+      } else {
+          callback(new Error('Not allowed by CORS'));
+      }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 
 app.use(async (req, res, next) => {
   if (!db) {
