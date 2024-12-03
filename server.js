@@ -123,31 +123,43 @@ app.get('/search', async (req, res) => {
 // POST route to save a new order
 app.post('/Orders', async (req, res) => {
   try {
-    const newOrder = req.body; // Extract order details from the request body
-    const result = await db.collection('Orders').insertOne(newOrder); // Insert new order into the 'Orders' collection
-    res.status(201).json(result); // Send insertion result with status 201 (Created)
+      const newOrder = req.body;
+
+      // Add a timestamp
+      newOrder.createdAt = new Date();
+
+      const result = await db.collection('Orders').insertOne(newOrder);
+
+      res.status(201).json({
+          message: 'Order placed successfully',
+          orderId: result.insertedId
+      });
   } catch (error) {
-    console.error('Error saving order:', error); // Log errors
-    res.status(500).json({ message: 'Error saving order', error: error.message }); // Send error response
+      console.error('Error saving order:', error);
+      res.status(500).json({ message: 'Error saving order', error: error.message });
   }
 });
+
 
 // PUT route to update the available spaces for a lesson
 app.put('/Lessons/:id', async (req, res) => {
   try {
-    const { id } = req.params; // Extract lesson ID from the request parameters
-    const { space } = req.body; // Extract the updated space value from the request body
-    const result = await db.collection('Lessons').updateOne(
-      { _id: new MongoClient.ObjectId(id) }, //  ObjectId conversion
-      { $set: updateData } // Use $set to update multiple fields
-    );
+      const { id } = req.params;
+      const { space } = req.body; // Extract 'space' from request body
 
-    res.json(result); // Send the update result as JSON
+      // Perform the update
+      const result = await db.collection('Lessons').updateOne(
+          { _id: new MongoClient.ObjectId(id) },
+          { $set: { space } } // Use the extracted 'space' value
+      );
+
+      res.json(result);
   } catch (error) {
-    console.error('Error updating lesson:', error); // Log errors
-    res.status(500).json({ message: 'Error updating lesson', error: error.message }); // Send error response
+      console.error('Error updating lesson:', error);
+      res.status(500).json({ message: 'Error updating lesson', error: error.message });
   }
 });
+
 
 // Function to start the server
 async function startServer() {
