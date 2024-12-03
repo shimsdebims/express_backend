@@ -33,7 +33,7 @@ async function connectToDatabase() {
 
 // Middleware
 app.use(cors({
-  origin: 'https://shimsdebims.github.io/vueapp/'
+  origin: 'https://shimsdebims.github.io/'
 }));
  // Enable CORS for all incoming requests
 app.use(express.json()); // Middleware to parse incoming JSON request bodies
@@ -44,11 +44,17 @@ app.use((req, res, next) => {
 });
 
 // GET route to fetch all lessons
-app.get('https://express-backend-fyqh.onrender.com/api/Lessons', async (req, res) => {
+app.get('/api/Lessons', async (req, res) => {
   try {
     console.log('Lessons route hit'); // Log the route being accessed
     const Lessons = await db.collection('Lessons').find({}).toArray(); // Fetch all documents in the 'Lessons' collection
     console.log('Lessons found:', Lessons); // Log the retrieved lessons
+        
+    // Add CORS headers explicitly
+    res.header('Access-Control-Allow-Origin', 'https://shimsdebims.github.io');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    
     res.json(Lessons); // Send lessons as a JSON response
   } catch (error) {
     console.error('Error fetching Lessons:', error); // Log errors
