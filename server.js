@@ -31,9 +31,10 @@ async function connectToDatabase() {
 }
 
 
-// Middleware
+// 
 app.use(cors({
-  origin: ['https://shimsdebims.github.io', 'http://localhost:10000', 'http://localhost:3000'],
+  origin: ['https://shimsdebims.github.io/', 'http://localhost:10000', 'http://localhost:5500', 
+    '*'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
