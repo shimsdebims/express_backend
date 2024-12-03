@@ -10,9 +10,6 @@ const PORT = process.env.PORT || 10000; //PORT NUMBER
 
 // Create an Express app
 const app = express();
-
-
-
 // MongoDB connection 
 const MONGODB_URI = process.env.MONGODB_URI; 
 let db; // MongoDB connection variable
@@ -20,25 +17,31 @@ let db; // MongoDB connection variable
 // Function to connect to MongoDB
 async function connectToDatabase() {
   try {
-    const client = new MongoClient(MONGODB_URI); // Initialize MongoDB client
-    await client.connect(); // Connect to MongoDB server
-    console.log('Connected to MongoDB');
-    db = client.db(DB_NAME); // Assign the database instance to the `db` variable
+      const client = new MongoClient(MONGODB_URI);
+      await client.connect();
+      console.log('Connected to MongoDB');
+      db = client.db(DB_NAME);
   } catch (error) {
-    console.error('Failed to connect to MongoDB', error); // Log any connection errors
-    process.exit(1); // Exit the application if unable to connect to MongoDB
+      console.error('Failed to connect to MongoDB:', error.message);
+      process.exit(1);
   }
 }
 
-
 // 
 app.use(cors({
-  origin: ['https://shimsdebims.github.io/', 'http://localhost:10000', 'http://localhost:5500', 
-    '*'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: ['https://shimsdebims.github.io'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+
+app.use(async (req, res, next) => {
+  if (!db) {
+      return res.status(500).json({ error: 'Database not connected' });
+  }
+  next();
+});
+
 
 // Add a preflight handler for OPTIONS requests
 app.options('*', cors());
@@ -53,21 +56,16 @@ app.use((req, res, next) => {
 // GET route to fetch all lessons
 app.get('/Lessons', async (req, res) => {
   try {
-    console.log('Lessons route hit'); // Log the route being accessed
-    const Lessons = await db.collection('Lessons').find({}).toArray(); // Fetch all documents in the 'Lessons' collection
-    console.log('Lessons found:', Lessons); // Log the retrieved lessons
-        
-    // Add CORS headers explicitly
-    res.header('Access-Control-Allow-Origin', 'https://shimsdebims.github.io');
-    res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    
-    res.json(Lessons); // Send lessons as a JSON response
+      console.log('Fetching lessons...');
+      const Lessons = await db.collection('Lessons').find({}).toArray();
+      console.log('Lessons found:', Lessons);
+      res.json(Lessons);
   } catch (error) {
-    console.error('Error fetching Lessons:', error); // Log errors
-    res.status(500).json({ message: 'Error fetching Lessons', error: error.message }); // Send error response
+      console.error('Error fetching Lessons:', error);
+      res.status(500).json({ message: 'Error fetching Lessons', error: error.message });
   }
 });
+
 
 // Static file middleware for serving lesson images
 // Serve images from a specific directory
@@ -82,7 +80,6 @@ app.use('/images', express.static(path.join(__dirname, 'images'), {
 
 // Serve Vue.js frontend application
 app.use(express.static(path.join(__dirname, 'public'))); // Serve files from the 'public' directory
-
 
 
 // GET route to search for lessons based on query parameters
