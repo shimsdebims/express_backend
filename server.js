@@ -33,11 +33,14 @@ async function connectToDatabase() {
 
 // Middleware
 app.use(cors({
-  origin: ['https://shimsdebims.github.io', 'http://localhost:10000'], // Add allowed origins
+  origin: ['https://shimsdebims.github.io', 'http://localhost:10000', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Add a preflight handler for OPTIONS requests
+app.options('*', cors());
  // Enable CORS for all incoming requests
 app.use(express.json()); // Middleware to parse incoming JSON request bodies
 app.use(morgan('dev')); // Logs HTTP requests to the console in 'dev' format
